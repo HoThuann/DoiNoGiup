@@ -572,24 +572,32 @@ export default function DebtlyPage() {
                     Xem trước tin nhắn
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleShufflePreview}
-                      className="border-2 border-primary text-primary hover:bg-muted font-semibold h-8"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                      Đổi mẫu
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopyPreview}
-                      className="border-2 border-primary text-primary hover:bg-muted font-semibold h-8"
-                    >
-                      <Copy className="w-3.5 h-3.5 mr-1" />
-                      Sao chép
-                    </Button>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleShufflePreview}
+                        className="group relative overflow-hidden border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground focus:ring-2 focus:ring-primary/20 transition-all font-semibold h-8"
+                      >
+                        <span className="relative z-10 flex items-center">
+                          <RefreshCw className={`w-3.5 h-3.5 mr-1 transition-transform duration-500 ${isShuffling ? "animate-spin" : "group-hover:rotate-180"}`} />
+                          Đổi mẫu
+                        </span>
+                      </Button>
+                    </motion.div>
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCopyPreview}
+                        className="group relative overflow-hidden border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground focus:ring-2 focus:ring-primary/20 transition-all font-semibold h-8"
+                      >
+                        <span className="relative z-10 flex items-center">
+                          <Copy className="w-3.5 h-3.5 mr-1 transition-transform duration-300 group-hover:scale-y-110 group-hover:-translate-y-0.5" />
+                          Sao chép
+                        </span>
+                      </Button>
+                    </motion.div>
                   </div>
                 </CardTitle>
               </CardHeader>
