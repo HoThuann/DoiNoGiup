@@ -261,7 +261,7 @@ export default function DebtlyPage() {
 
   const handleLogout = async () => {
     await signOut(auth)
-    toast.success("Đã đăng xuất thành công!")
+    toast.success("Đã đăng xuất thành công! Hẹn gặp lại nhé 👋")
   }
 
   return (
@@ -343,9 +343,35 @@ export default function DebtlyPage() {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-5xl mx-auto px-4 pb-16"
+        className="max-w-5xl mx-auto px-4 pb-16 relative"
       >
-        <div className="grid md:grid-cols-2 gap-6">
+        {!user && (
+          <motion.div 
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }}
+            className="absolute inset-x-4 inset-y-0 z-40 bg-background/50 backdrop-blur-[6px] rounded-2xl flex flex-col items-center justify-center p-4 shadow-[0_0_40px_rgba(0,0,0,0.05)] border border-primary/10"
+          >
+            <div className="text-center bg-card p-10 rounded-2xl border-2 border-primary shadow-[8px_8px_0px_0px_var(--color-primary)] max-w-lg mb-[20vh] relative overflow-hidden group">
+              <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ repeat: Infinity, duration: 5 }}>
+                <LogIn className="w-16 h-16 text-primary mx-auto mb-4" />
+              </motion.div>
+              <h3 className="text-2xl font-bold text-primary mb-3">Úi chà, bạn chưa đăng nhập!</h3>
+              <p className="text-muted-foreground mb-8 text-lg font-medium">Đăng nhập ngay để mở khóa toàn bộ quyền năng và "tiếp cận" những con nợ đang lưu lạc nhé 💸</p>
+              <Button size="lg" className="w-full font-bold text-lg py-6 relative overflow-hidden group/btn hover:shadow-[4px_4px_0px_0px_var(--color-primary)] transition-all" onClick={() => router.push('/login')}>
+                <span className="relative z-10 flex items-center">
+                  Đăng nhập ngay bây giờ
+                </span>
+                <motion.div
+                  className="absolute inset-0 z-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%)] w-[200%]"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                />
+              </Button>
+            </div>
+          </motion.div>
+        )}
+        <div className={`transition-all duration-300 ${!user ? 'pointer-events-none select-none blur-[6px] opacity-40 grayscale-[20%]' : ''}`}>
+          <div className="grid md:grid-cols-2 gap-6">
           <motion.div variants={cardVariants} whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
             <Card className="border-2 border-foreground shadow-[4px_4px_0px_0px_#222222] hover:shadow-[6px_6px_0px_0px_#222222] transition-shadow bg-card">
               <CardHeader className="border-b-2 border-foreground">
@@ -657,6 +683,7 @@ export default function DebtlyPage() {
             </Button>
           </motion.div>
         </motion.div>
+        </div>
       </motion.main>
     </div>
   )
