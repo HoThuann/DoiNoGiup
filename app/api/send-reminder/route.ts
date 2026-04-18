@@ -20,25 +20,44 @@ export async function POST(req: NextRequest) {
   try {
     const { debtorName, debtorEmail, amount, currency, schedule, message, senderName, qrImage } = await req.json()
 
-    // Tạo phần QR trong email nếu có
-    const qrSection = qrImage
-      ? `
+    // Xử lý QR image: tách base64 và mime type để dùng CID attachment
+    let attachments: any[] = []
+    let qrSection = ""
+
+    if (qrImage && typeof qrImage === "string" && qrImage.startsWith("data:")) {
+      const matches = qrImage.match(/^data:([a-zA-Z0-9+/]+\/[a-zA-Z0-9+/]+);base64,(.+)$/)
+      if (matches) {
+        const mimeType = matches[1]           // e.g. "image/jpeg"
+        const base64Data = matches[2]         // raw base64 string
+
+        attachments = [{
+          filename: "qr-thanhtoan.png",
+          content: base64Data,
+          encoding: "base64",
+          cid: "qrcode@doinothanthien",       // Content-ID dùng trong HTML
+          contentType: mimeType,
+        }]
+
+        // Dùng cid: thay vì data: để email client hiển thị được
+        qrSection = `
         <!-- QR Code -->
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
           <tr>
             <td style="background:#f9fafb;border:2px dashed #d4d4d8;border-radius:8px;padding:20px;text-align:center;">
               <p style="margin:0 0 12px;font-size:13px;color:#71717a;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Quét mã để chuyển khoản nhanh</p>
-              <img src="${qrImage}" alt="QR thanh toán" width="180" height="180" style="border-radius:8px;border:2px solid #e4e4e7;display:block;margin:0 auto;" />
+              <img src="cid:qrcode@doinothanthien" alt="QR thanh toán" width="180" height="180" style="border-radius:8px;border:2px solid #e4e4e7;display:block;margin:0 auto;" />
               <p style="margin:12px 0 0;font-size:13px;color:#71717a;">📸 Mở app ngân hàng và quét mã QR trên</p>
             </td>
           </tr>
         </table>`
-      : ""
+      }
+    }
 
     await transporter.sendMail({
       from: `"${senderName || "Đòi Nợ Thân Thiện"} via Đòi Nợ Thân Thiện" <${process.env.GMAIL_USER}>`,
       to: debtorEmail,
       subject: `💸 ${senderName || "Một người bạn"} đang nhắc bạn về khoản nợ ${amount} ${currency}`,
+      attachments,
       html: `
 <!DOCTYPE html>
 <html lang="vi">

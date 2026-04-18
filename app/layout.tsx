@@ -3,6 +3,7 @@ import { Lexend_Deca } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from "@/components/ui/sonner"
 import { AuthProvider } from "@/components/AuthContext"
+import { ThemeProvider } from "@/components/theme-provider"
 import './globals.css'
 
 const _geist = { subsets: ["latin"] }; // unused, keeping import to avoid breaking
@@ -42,12 +43,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="vi" className="bg-background">
+    <html lang="vi" className="bg-background" suppressHydrationWarning>
       <body className={`font-sans antialiased ${lexendDeca.variable}`}>
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <AuthProvider>
+            {children}
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

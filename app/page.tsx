@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut, QrCode, X } from "lucide-react"
+import { Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut, QrCode, X, Moon, Sun } from "lucide-react"
 import Image from "next/image"
 import confetti from "canvas-confetti"
+import { useTheme } from "next-themes"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -101,9 +102,52 @@ const heroVariants = {
   },
 }
 
+const BackgroundDecorations = () => {
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      {/* Floating Icons */}
+      <motion.div
+        className="absolute top-32 left-[10%] text-primary/30"
+        animate={{ y: [0, -20, 0], rotate: [0, -10, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <DollarSign className="w-16 h-16" />
+      </motion.div>
+      <motion.div
+        className="absolute top-48 right-[15%] text-primary/30"
+        animate={{ y: [0, 20, 0], rotate: [0, 15, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+      >
+        <Mail className="w-12 h-12" />
+      </motion.div>
+      <motion.div
+        className="absolute bottom-64 left-[15%] text-primary/30"
+        animate={{ scale: [1, 1.2, 1], y: [0, -15, 0] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+      >
+        <Heart className="w-14 h-14" />
+      </motion.div>
+      <motion.div
+        className="absolute bottom-32 right-[20%] text-primary/30"
+        animate={{ scale: [1, 1.5, 1], rotate: [0, 90, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+      >
+        <Sparkles className="w-20 h-20" />
+      </motion.div>
+    </div>
+  )
+}
+
 export default function DebtlyPage() {
   const router = useRouter()
   const { user } = useAuth()
+
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const [debtorName, setDebtorName] = useState("")
   const [debtorEmail, setDebtorEmail] = useState("")
@@ -221,31 +265,53 @@ export default function DebtlyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      <BackgroundDecorations />
+      
       <motion.header
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="border-b-2 border-foreground bg-card/50 backdrop-blur-sm sticky top-0 z-50"
+        className="border-b-2 border-primary bg-card/50 backdrop-blur-sm sticky top-0 z-50"
       >
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Image src="/logo.jpg" alt="Đòi nợ thân thiện logo" width={64} height={64} className="rounded-xl shadow-sm" />
-            <h1 className="text-lg tracking-tight text-foreground" style={{ fontFamily: 'var(--font-brand)', fontWeight: 600, letterSpacing: '-0.02em', color: '#222222' }}>Đòi Nợ Thân Thiện</h1>
+            <Image src="/logo.jpg" alt="Đòi nợ thân thiện logo" width={64} height={64} className="rounded-xl border-2 border-primary shadow-sm" />
+            <h1 className="text-lg tracking-tight text-primary" style={{ fontFamily: 'var(--font-brand)', fontWeight: 600, letterSpacing: '-0.02em' }}>Đòi Nợ Thân Thiện</h1>
           </div>
           <div className="flex items-center gap-2">
+            {mounted && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors mr-2 h-9 w-9"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+            )}
             {user ? (
               <>
-                <span className="text-sm font-medium text-muted-foreground hidden sm:block">
-                  Xin chào, {user.displayName?.split(' ').pop() || 'bạn'}!
-                </span>
-                <Button variant="outline" size="sm" className="border-2 border-foreground hover:bg-foreground hover:text-primary-foreground transition-colors" onClick={handleLogout}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Đăng xuất
+                <div className="hidden sm:flex items-center bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full shadow-sm hover:bg-primary/20 transition-colors">
+                  <User className="w-4 h-4 text-primary mr-2" />
+                  <span className="text-sm font-bold text-primary">
+                    Xin chào, {user.displayName?.split(' ').pop() || 'bạn'}!
+                  </span>
+                </div>
+                <Button variant="outline" size="sm" className="relative overflow-hidden group border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors" onClick={handleLogout}>
+                  <span className="relative z-10 flex items-center">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Đăng xuất
+                  </span>
+                  <motion.div
+                    className="absolute inset-0 z-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%)] w-[200%]"
+                    animate={{ x: ["-100%", "100%"] }}
+                    transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                  />
                 </Button>
               </>
             ) : (
-              <Button variant="outline" size="sm" className="border-2 border-foreground hover:bg-foreground hover:text-primary-foreground transition-colors" onClick={() => router.push('/login')}>
+              <Button variant="outline" size="sm" className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-colors" onClick={() => router.push('/login')}>
                 <LogIn className="w-4 h-4 mr-2" />
                 Đăng nhập
               </Button>
@@ -258,11 +324,16 @@ export default function DebtlyPage() {
         variants={heroVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-5xl mx-auto px-4 pt-12 pb-8 text-center"
+        className="max-w-5xl mx-auto px-4 pt-12 pb-8 text-center relative z-10"
       >
-        <h2 className="text-4xl md:text-5xl text-foreground mb-4 text-balance text-center" style={{ fontWeight: 700, fontFamily: 'var(--font-brand)' }}>
+        <motion.h2 
+          className="text-4xl md:text-5xl text-primary mb-4 text-balance text-center drop-shadow-sm" 
+          style={{ fontWeight: 700, fontFamily: 'var(--font-brand)' }}
+          animate={{ scale: [1, 1.02, 1] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        >
           Đòi nợ tinh tế, không hề mất lòng.
-        </h2>
+        </motion.h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
           Chill thôi~ "Để Đòi nợ thân thiện lo!" Tự động gửi tin nhắn nhắc nợ siêu cute, không awkward, bạn bè vẫn thân
         </p>
@@ -291,7 +362,7 @@ export default function DebtlyPage() {
                     placeholder="Vd: Minh béo, Hùng gấu..."
                     value={debtorName}
                     onChange={(e) => setDebtorName(e.target.value)}
-                    className="border-2 border-foreground focus:ring-2 focus:ring-foreground/20"
+                    className="border-2 border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
 
@@ -306,7 +377,7 @@ export default function DebtlyPage() {
                     placeholder="Vd: minhbeo@gmail.com"
                     value={debtorEmail}
                     onChange={(e) => setDebtorEmail(e.target.value)}
-                    className="border-2 border-foreground focus:ring-2 focus:ring-foreground/20"
+                    className="border-2 border-primary focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
 
@@ -325,15 +396,15 @@ export default function DebtlyPage() {
                         const raw = e.target.value.replace(/\./g, "").replace(/,/g, "")
                         if (/^\d*$/.test(raw)) setAmount(raw)
                       }}
-                      className="border-2 border-foreground focus:ring-2 focus:ring-foreground/20 flex-1"
+                      className="border-2 border-primary focus:ring-2 focus:ring-primary/20 flex-1"
                     />
-                    <div className="flex border-2 border-foreground rounded-md overflow-hidden">
+                    <div className="flex border-2 border-primary rounded-md overflow-hidden">
                       <button
                         type="button"
                         onClick={() => setCurrency("VND")}
                         className={`px-3 py-2 text-sm font-semibold transition-colors ${currency === "VND"
-                            ? "bg-foreground text-primary-foreground"
-                            : "bg-card hover:bg-muted"
+                          ? "bg-foreground text-primary-foreground"
+                          : "bg-card hover:bg-muted"
                           }`}
                       >
                         VND
@@ -342,8 +413,8 @@ export default function DebtlyPage() {
                         type="button"
                         onClick={() => setCurrency("USD")}
                         className={`px-3 py-2 text-sm font-semibold transition-colors border-l-2 border-foreground ${currency === "USD"
-                            ? "bg-foreground text-primary-foreground"
-                            : "bg-card hover:bg-muted"
+                          ? "bg-foreground text-primary-foreground"
+                          : "bg-card hover:bg-muted"
                           }`}
                       >
                         USD
@@ -367,11 +438,11 @@ export default function DebtlyPage() {
                   />
                   {qrImage ? (
                     <div className="relative inline-block">
-                      <img src={qrImage} alt="QR thanh toán" className="w-32 h-32 rounded-lg border-2 border-foreground object-cover" />
+                      <img src={qrImage} alt="QR thanh toán" className="w-32 h-32 rounded-lg border-2 border-primary object-cover" />
                       <button
                         type="button"
                         onClick={() => { setQrImage(null); if (qrInputRef.current) qrInputRef.current.value = "" }}
-                        className="absolute -top-2 -right-2 bg-foreground text-background rounded-full w-5 h-5 flex items-center justify-center"
+                        className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -380,7 +451,7 @@ export default function DebtlyPage() {
                     <button
                       type="button"
                       onClick={() => qrInputRef.current?.click()}
-                      className="w-full border-2 border-dashed border-foreground/40 rounded-lg p-4 text-sm text-muted-foreground hover:border-foreground hover:bg-muted/30 transition-all flex flex-col items-center gap-1"
+                      className="w-full border-2 border-dashed border-primary/40 rounded-lg p-4 text-sm text-foreground hover:border-primary hover:bg-muted/30 transition-all flex flex-col items-center gap-1"
                     >
                       <QrCode className="w-6 h-6" />
                       <span>Upload ảnh mã QR ngân hàng của bạn</span>
@@ -392,9 +463,9 @@ export default function DebtlyPage() {
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="border-2 border-foreground shadow-[4px_4px_0px_0px_#222222] bg-card">
-              <CardHeader className="border-b-2 border-foreground">
-                <CardTitle className="text-xl font-bold">Chọn mood nha</CardTitle>
+            <Card className="border-2 border-primary shadow-[4px_4px_0px_0px_var(--color-primary)] bg-card">
+              <CardHeader className="border-b-2 border-primary">
+                <CardTitle className="text-xl font-bold text-primary">Chọn mood nha</CardTitle>
               </CardHeader>
               <CardContent className="pt-6">
                 <RadioGroup
@@ -410,9 +481,9 @@ export default function DebtlyPage() {
                     >
                       <Label
                         htmlFor={key}
-                        className={`flex items-center gap-4 p-4 border-2 border-foreground rounded-md cursor-pointer transition-all ${mood === key
-                            ? "bg-foreground text-primary-foreground shadow-[2px_2px_0px_0px_#222222]"
-                            : "bg-card hover:bg-muted"
+                        className={`flex items-center gap-4 p-4 border-2 border-primary rounded-md cursor-pointer transition-all ${mood === key
+                          ? "bg-primary text-primary-foreground shadow-[2px_2px_0px_0px_var(--color-primary)]"
+                          : "bg-card hover:bg-muted text-primary"
                           }`}
                       >
                         <RadioGroupItem value={key} id={key} className="sr-only" />
@@ -434,9 +505,9 @@ export default function DebtlyPage() {
           </motion.div>
 
           <motion.div variants={cardVariants}>
-            <Card className="border-2 border-foreground shadow-[4px_4px_0px_0px_#222222] bg-card">
-              <CardHeader className="border-b-2 border-foreground">
-                <CardTitle className="text-xl font-bold flex items-center gap-2">
+            <Card className="border-2 border-primary shadow-[4px_4px_0px_0px_var(--color-primary)] bg-card">
+              <CardHeader className="border-b-2 border-primary">
+                <CardTitle className="text-xl font-bold flex items-center gap-2 text-primary">
                   <Calendar className="w-5 h-5" />
                   Nhắc bao lâu 1 lần?
                 </CardTitle>
@@ -451,9 +522,9 @@ export default function DebtlyPage() {
                     <motion.div key={key} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Label
                         htmlFor={`schedule-${key}`}
-                        className={`flex items-center justify-center p-4 border-2 border-foreground rounded-md cursor-pointer transition-all text-center font-semibold ${schedule === key
-                            ? "bg-foreground text-primary-foreground"
-                            : "bg-card hover:bg-muted"
+                        className={`flex items-center justify-center p-4 border-2 border-primary rounded-md cursor-pointer transition-all text-center font-semibold ${schedule === key
+                          ? "bg-primary text-primary-foreground shadow-[2px_2px_0px_0px_var(--color-primary)]"
+                          : "bg-card hover:bg-muted text-primary"
                           }`}
                       >
                         <RadioGroupItem value={key} id={`schedule-${key}`} className="sr-only" />
@@ -467,9 +538,9 @@ export default function DebtlyPage() {
           </motion.div>
 
           <motion.div variants={cardVariants} ref={previewRef} whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
-            <Card className="border-2 border-foreground shadow-[4px_4px_0px_0px_#222222] hover:shadow-[6px_6px_0px_0px_#222222] transition-shadow bg-card">
-              <CardHeader className="border-b-2 border-foreground">
-                <CardTitle className="text-xl font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <Card className="border-2 border-primary shadow-[4px_4px_0px_0px_var(--color-primary)] hover:shadow-[6px_6px_0px_0px_var(--color-primary)] transition-shadow bg-card">
+              <CardHeader className="border-b-2 border-primary">
+                <CardTitle className="text-xl font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-primary">
                   <div className="flex items-center gap-2">
                     <Eye className="w-5 h-5" />
                     Xem trước tin nhắn
@@ -479,7 +550,7 @@ export default function DebtlyPage() {
                       variant="outline"
                       size="sm"
                       onClick={handleShufflePreview}
-                      className="border-2 border-foreground hover:bg-muted font-semibold h-8"
+                      className="border-2 border-primary text-primary hover:bg-muted font-semibold h-8"
                     >
                       <RefreshCw className="w-3.5 h-3.5 mr-1" />
                       Đổi mẫu
@@ -488,7 +559,7 @@ export default function DebtlyPage() {
                       variant="outline"
                       size="sm"
                       onClick={handleCopyPreview}
-                      className="border-2 border-foreground hover:bg-muted font-semibold h-8"
+                      className="border-2 border-primary text-primary hover:bg-muted font-semibold h-8"
                     >
                       <Copy className="w-3.5 h-3.5 mr-1" />
                       Sao chép
@@ -528,7 +599,7 @@ export default function DebtlyPage() {
                           setEditedMessage(e.target.value)
                           setIsManuallyEdited(true)
                         }}
-                        className="min-h-[220px] bg-muted/50 border-2 border-dashed border-foreground/30 rounded-md p-4 text-base font-sans leading-relaxed text-foreground resize-y focus-visible:ring-2 focus-visible:ring-foreground/20 focus-visible:border-foreground"
+                        className="min-h-[220px] bg-card border-2 border-dashed border-primary/50 rounded-md p-4 text-base font-sans leading-relaxed text-foreground resize-y focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary"
                         placeholder="Nhập nội dung nhắc nợ..."
                       />
                     </motion.div>
@@ -540,10 +611,10 @@ export default function DebtlyPage() {
                   <motion.div
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col items-center gap-2 border-2 border-dashed border-foreground/30 rounded-lg p-4 bg-muted/30"
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-primary/50 rounded-lg p-4 bg-muted/30"
                   >
-                    <img src={qrImage} alt="QR thanh toán" className="w-36 h-36 rounded-lg object-cover border-2 border-foreground/20" />
-                    <p className="text-sm font-medium text-muted-foreground">Quét mã để chuyển khoản nhanh nhé! 📸</p>
+                    <img src={qrImage} alt="QR thanh toán" className="w-36 h-36 rounded-lg object-cover border-2 border-primary/50" />
+                    <p className="text-sm font-medium text-primary">Quét mã để chuyển khoản nhanh nhé! 📸</p>
                   </motion.div>
                 )}
               </CardContent>
@@ -553,17 +624,36 @@ export default function DebtlyPage() {
 
         <motion.div
           variants={cardVariants}
-          className="mt-8 flex justify-center"
+          className="mt-8 flex justify-center relative z-10"
         >
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <motion.div 
+            whileHover={{ scale: 1.05 }} 
+            whileTap={{ scale: 0.95 }}
+            animate={!isSending ? { 
+              boxShadow: ["0px 0px 0px rgba(0,0,0,0)", "0px 0px 20px var(--color-primary)", "0px 0px 0px rgba(0,0,0,0)"] 
+            } : {}}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="rounded-md"
+          >
             <Button
               size="lg"
               onClick={handleActivate}
               disabled={isSending}
-              className="bg-foreground text-primary-foreground border-2 border-foreground shadow-[4px_4px_0px_0px_#222222] hover:shadow-[2px_2px_0px_0px_#222222] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-lg px-8 py-6 font-bold disabled:opacity-70 disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[4px_4px_0px_0px_#222222]"
+              className="relative overflow-hidden bg-primary text-primary-foreground border-2 border-primary shadow-[4px_4px_0px_0px_var(--color-primary)] hover:shadow-[2px_2px_0px_0px_var(--color-primary)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all text-lg px-8 py-6 font-bold disabled:opacity-70 disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-[4px_4px_0px_0px_var(--color-primary)] group"
             >
-              <Send className="w-5 h-5 mr-2" />
-              {isSending ? "Đang gửi email..." : "Kích hoạt nhắc nhở"}
+              <span className="relative z-10 flex items-center">
+                <Send className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                {isSending ? "Đang gửi email..." : "Gửi lời nhắc nhở"}
+              </span>
+              
+              {/* Shimmer Effect overlay */}
+              {!isSending && (
+                <motion.div
+                  className="absolute inset-0 z-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%)] w-[200%]"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                />
+              )}
             </Button>
           </motion.div>
         </motion.div>
