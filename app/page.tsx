@@ -37,18 +37,31 @@ const emailPreviews: Record<Mood, Array<(name: string, amount: string, currency:
     (name, amount, currency) => `Hiii ${name || "bạn ơi"} ~\n\nMình ghé qua inbox của cậu nè! Không biết cậu có nhớ chuyển khoản tiền ${amount || "xxx"} ${currency} hông?\n\nTớ biết cậu bận rồi, nhưng mà... nếu tiện thì cậu chuyển giúp tớ nha~ Tớ cảm ơn cậu trước luôn ạ!\n\nLove youuu ~\nBạn thân của cậu`,
     (name, amount, currency) => `Éc éc 🐷 Chào ${name || "cậu"} nè,\n\nNhắc nhẹ là hình như cậu đang quên cái bill ${amount || "xxx"} ${currency} khum nè? 🤫\n\nRảnh rỗi thì ting ting liền cho tui nhớ, iu xỉu! ✨\n\nNè tim nè ❤️`,
     (name, amount, currency) => `Hế lô ${name || "đằng ấy"}, dạo này khoẻ chớ?\n\nChuyện là số tiền ${amount || "xxx"} ${currency} bữa trước nó đang gọi tên cậu đó nhaaa.\n\nNhớ kiểm tra và gửi lại cho tớ nha nha. Cảm ơn nhiều lắmmm! 🌷`,
+    (name, amount, currency) => `Ủa ${name || "bạn ơi"} ơi 👀\n\nTớ đang nhìn vào ví thì thấy thiếu mất ${amount || "xxx"} ${currency} kìa!\n\nChắc là nó đang nằm ở chỗ cậu đúng hông ta? Hehe, chuyển về nhà nó giúp tớ nhé! 🏠💸\n\nHết mình yêu cậu~ 🥰`,
+    (name, amount, currency) => `Psst psst... ${name || "ê cậu"} ơi! 🤭\n\nTớ không muốn làm phiền đâu nhưng mà... cậu có nhớ hôm bữa tớ cho cậu mượn ${amount || "xxx"} ${currency} không?\n\nKhông sao hết, tớ just saying thôi á! Tiện thì trả nha cậu ơiiii 💌\n\nMãi thương cậu~`,
+    (name, amount, currency) => `🌟 Tin nhắn đặc biệt dành cho ${name || "người bạn xinh đẹp của tui"}!\n\nNội dung: ${amount || "xxx"} ${currency} đang nhớ cậu lắm á và muốn về nhà (là ví của tớ) 😆\n\nBao giờ cậu rảnh thì cho nó về nha! Tớ đãi cậu trà sữa sau 🧋\n\nXOXO 💋`,
+    (name, amount, currency) => `Cậu ơi cậu ơi cậu ơi! 🙈\n\nTớ vừa xem lại sổ nợ (có, tớ có sổ nợ thật đó!) thì ra là cậu đang nợ tớ ${amount || "xxx"} ${currency} nè.\n\nỪ thì cậu bận tớ hiểu, nhưng mà lúc nào đó nhớ gửi lại tớ nghen! Không cần gấp đâu... à mà gấp một chút cũng được 🤣\n\nBff forever~ 🌈`,
   ],
   humble: [
     (name, amount, currency) => `Chào ${name || "bạn"} ơi,\n\nMình viết mail này hơi ngại xíu... Nhưng mà mình muốn nhắc nhẹ về khoản ${amount || "xxx"} ${currency} nha.\n\nMình hiểu cậu cũng có lúc khó khăn, nhưng nếu được thì cậu sắp xếp giúp mình nghen. Mình cảm ơn cậu rất nhiều!\n\nChúc cậu một ngày tốt lành,\nNgười bạn của cậu`,
     (name, amount, currency) => `Gửi ${name || "bạn"},\n\nHiện tại mình đang cần xoay xở một chút việc nên mới nhắn bạn, bạn xem sắp xếp gửi lại mình khoản ${amount || "xxx"} ${currency} nghen.\n\nNếu chưa tiện thì nhắn cho mình một tiếng nha. Thông cảm giúp mình nha!\n\nThương mến,`,
     (name, amount, currency) => `Chào ${name || "bạn"},\n\nXin lỗi vì đã làm phiền nha. Mình có xem lại ghi chú thì thấy bạn còn đang gửi mình khoản ${amount || "xxx"} ${currency}.\n\nKhi nào thoải mái thì tranh thủ giải quyết giúp mình với nhé. Cảm ơn bạn rất nhiều vì sự thấu hiểu!\n\nTrân trọng,`,
+    (name, amount, currency) => `${name || "Bạn"} ơi,\n\nMình biết cuộc sống đôi lúc có nhiều áp lực, và mình không muốn thêm gánh nặng cho bạn đâu.\n\nNhưng nếu bạn có thể sắp xếp hoàn trả khoản ${amount || "xxx"} ${currency} trong thời gian gần đây, mình sẽ rất biết ơn. Còn không thì mình và bạn nói chuyện thêm nhé.\n\nLuôn trân trọng tình bạn của chúng mình,`,
+    (name, amount, currency) => `Xin chào ${name || "bạn"},\n\nMình nhắn tin này sau một hồi đắn đo, vì thực ra mình không muốn khoản tiền ${amount || "xxx"} ${currency} ảnh hưởng đến tình cảm giữa hai đứa.\n\nBạn cứ từ từ sắp xếp theo khả năng, mình không vội. Chỉ cần bạn nhớ và có kế hoạch là mình yên tâm rồi.\n\nCảm ơn bạn đã hiểu mình,`,
+    (name, amount, currency) => `${name || "Bạn"} thân mến,\n\nDạo này bạn có khoẻ không? Mình hỏi thăm và cũng nhân tiện nhắc nhẹ về khoản ${amount || "xxx"} ${currency} mình đã hỗ trợ bạn trước đây.\n\nMình tin bạn không quên, chỉ là cuộc sống bận bịu thôi. Khi nào bạn sắp xếp được hãy báo mình nhé.\n\nVẫn luôn là bạn tốt của nhau,`,
+    (name, amount, currency) => `Gửi đến ${name || "người bạn của mình"},\n\nMình gửi tin nhắn này với một chút ngại ngùng, nhưng tình bạn thật sự là phải thẳng thắn với nhau đúng không?\n\nKhoản ${amount || "xxx"} ${currency} đã được một thời gian rồi, mình cũng đang có chút cần dùng đến. Bạn thông cảm và hỗ trợ mình nhé.\n\nMãi yêu quý bạn,`,
   ],
   professional: [
     (name, amount, currency) => `Kính gửi ${name || "Anh/Chị"},\n\nTôi xin phép gửi email này để nhắc nhở về khoản thanh toán ${amount || "xxx"} ${currency} đến hạn.\n\nRất mong Anh/Chị sắp xếp thời gian thuận tiện để hoàn tất giao dịch. Nếu có thắc mắc, xin vui lòng liên hệ lại với tôi.\n\nTrân trọng,\n[Tên của bạn]`,
     (name, amount, currency) => `Kính gửi Anh/Chị ${name || "Khách hàng/Đối tác"},\n\nTheo hồ sơ công nợ của chúng tôi, khoản thanh toán trị giá ${amount || "xxx"} ${currency} hiện đã sắp đến kỳ hạn giải quyết.\n\nĐề nghị Anh/Chị ưu tiên xử lý trong thời gian tới. Kèm theo là thông tin thanh toán nếu cần. Xin cảm ơn sự hợp tác của Anh/Chị.\n\nTrân trọng,`,
     (name, amount, currency) => `Kính gửi ${name || "Anh/Chị"},\n\nEmail này là thông báo tự động về khoản còn nợ: ${amount || "xxx"} ${currency}.\n\nVui lòng kiểm tra đối soát và hoàn thành nghĩa vụ tài chính theo thỏa thuận. Chúc Anh/Chị nhiều sức khỏe và đạt hiệu quả công việc.\n\nTrân trọng báo tin,`,
+    (name, amount, currency) => `Kính gửi ${name || "Quý khách"},\n\nChúng tôi xin trân trọng thông báo rằng khoản công nợ ${amount || "xxx"} ${currency} của Quý vị hiện chưa được thanh lý theo đúng thời hạn cam kết.\n\nKính đề nghị Quý vị xem xét và thực hiện thanh toán trong thời gian sớm nhất để tránh phát sinh các vấn đề không mong muốn.\n\nKính trân trọng,`,
+    (name, amount, currency) => `Thông báo nhắc nợ\n\nKính gửi: ${name || "Anh/Chị"}\nSố tiền: ${amount || "xxx"} ${currency}\nTrạng thái: Chưa thanh toán\n\nChúng tôi ghi nhận rằng khoản thu kể trên vẫn chưa được xử lý. Đề nghị Anh/Chị kiểm tra và phản hồi trong vòng 3-5 ngày làm việc.\n\nMọi thắc mắc xin liên hệ trực tiếp để được hỗ trợ.\n\nTrân trọng,`,
+    (name, amount, currency) => `Kính gửi ${name || "Anh/Chị"},\n\nNhân dịp rà soát định kỳ, chúng tôi nhận thấy khoản thanh toán ${amount || "xxx"} ${currency} vẫn đang ở trạng thái chưa hoàn tất.\n\nChúng tôi đánh giá cao mối quan hệ hợp tác lâu dài và tin tưởng đây chỉ là sơ sót nhỏ. Kính mong Anh/Chị sắp xếp thanh toán sớm để duy trì uy tín và quan hệ đôi bên.\n\nTrân trọng cảm ơn,`,
+    (name, amount, currency) => `THÔNG BÁO NHẮC THANH TOÁN\n\nKính gửi: ${name || "Anh/Chị"}\n\nĐây là thông báo thứ [số lần] nhắc nhở về khoản thanh toán ${amount || "xxx"} ${currency} đã quá hạn.\n\nĐề nghị Anh/Chị thực hiện thanh toán ngay hoặc liên hệ để thỏa thuận phương án giải quyết phù hợp. Sự chậm trễ có thể ảnh hưởng đến uy tín hợp tác của hai bên.\n\nNghiêm túc trân trọng,`,
   ],
 }
+
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -190,7 +203,7 @@ export default function DebtlyPage() {
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image src="/logo.jpg" alt="Đòi nợ thân thiện logo" width={64} height={64} className="rounded-xl shadow-sm" />
-            <h1 className="text-lg font-black tracking-tight text-foreground" style={{ fontFamily: 'var(--font-brand)', fontWeight: 800 }}>Đòi Nợ Thân Thiện</h1>
+            <h1 className="text-lg tracking-tight text-foreground" style={{ fontFamily: 'var(--font-brand)', fontWeight: 600, letterSpacing: '-0.02em', color: '#222222' }}>Đòi Nợ Thân Thiện</h1>
           </div>
           <div className="flex items-center gap-2">
             {user ? (
@@ -219,11 +232,11 @@ export default function DebtlyPage() {
         animate="visible"
         className="max-w-5xl mx-auto px-4 pt-12 pb-8 text-center"
       >
-        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
+        <h2 className="text-4xl md:text-5xl text-foreground mb-4 text-balance text-center" style={{ fontWeight: 700, fontFamily: 'var(--font-brand)' }}>
           Đòi nợ tinh tế, không hề mất lòng.
         </h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-          Chill thôi~ Để Debt-ly lo! Tự động gửi tin nhắn nhắc nợ siêu cute, không awkward, bạn bè vẫn thân
+          Chill thôi~ "Để Đòi nợ thân thiện lo!" Tự động gửi tin nhắn nhắc nợ siêu cute, không awkward, bạn bè vẫn thân
         </p>
       </motion.section>
 
@@ -290,22 +303,20 @@ export default function DebtlyPage() {
                       <button
                         type="button"
                         onClick={() => setCurrency("VND")}
-                        className={`px-3 py-2 text-sm font-semibold transition-colors ${
-                          currency === "VND"
+                        className={`px-3 py-2 text-sm font-semibold transition-colors ${currency === "VND"
                             ? "bg-foreground text-primary-foreground"
                             : "bg-card hover:bg-muted"
-                        }`}
+                          }`}
                       >
                         VND
                       </button>
                       <button
                         type="button"
                         onClick={() => setCurrency("USD")}
-                        className={`px-3 py-2 text-sm font-semibold transition-colors border-l-2 border-foreground ${
-                          currency === "USD"
+                        className={`px-3 py-2 text-sm font-semibold transition-colors border-l-2 border-foreground ${currency === "USD"
                             ? "bg-foreground text-primary-foreground"
                             : "bg-card hover:bg-muted"
-                        }`}
+                          }`}
                       >
                         USD
                       </button>
@@ -335,11 +346,10 @@ export default function DebtlyPage() {
                     >
                       <Label
                         htmlFor={key}
-                        className={`flex items-center gap-4 p-4 border-2 border-foreground rounded-md cursor-pointer transition-all ${
-                          mood === key
+                        className={`flex items-center gap-4 p-4 border-2 border-foreground rounded-md cursor-pointer transition-all ${mood === key
                             ? "bg-foreground text-primary-foreground shadow-[2px_2px_0px_0px_#222222]"
                             : "bg-card hover:bg-muted"
-                        }`}
+                          }`}
                       >
                         <RadioGroupItem value={key} id={key} className="sr-only" />
                         <span className={`p-2 rounded-md ${mood === key ? "bg-primary-foreground/20" : "bg-muted"}`}>
@@ -377,11 +387,10 @@ export default function DebtlyPage() {
                     <motion.div key={key} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Label
                         htmlFor={`schedule-${key}`}
-                        className={`flex items-center justify-center p-4 border-2 border-foreground rounded-md cursor-pointer transition-all text-center font-semibold ${
-                          schedule === key
+                        className={`flex items-center justify-center p-4 border-2 border-foreground rounded-md cursor-pointer transition-all text-center font-semibold ${schedule === key
                             ? "bg-foreground text-primary-foreground"
                             : "bg-card hover:bg-muted"
-                        }`}
+                          }`}
                       >
                         <RadioGroupItem value={key} id={`schedule-${key}`} className="sr-only" />
                         {scheduleLabels[key]}
@@ -402,18 +411,18 @@ export default function DebtlyPage() {
                     Xem trước tin nhắn
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={handleShufflePreview}
                       className="border-2 border-foreground hover:bg-muted font-semibold h-8"
                     >
                       <RefreshCw className="w-3.5 h-3.5 mr-1" />
                       Đổi mẫu
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       onClick={handleCopyPreview}
                       className="border-2 border-foreground hover:bg-muted font-semibold h-8"
                     >

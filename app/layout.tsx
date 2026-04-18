@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Nunito } from 'next/font/google'
+import { Lexend_Deca } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from "@/components/ui/sonner"
 import { AuthProvider } from "@/components/AuthContext"
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
-const nunito = Nunito({
+const _geist = { subsets: ["latin"] }; // unused, keeping import to avoid breaking
+const _geistMono = { subsets: ["latin"] };
+const lexendDeca = Lexend_Deca({
   subsets: ["latin", "vietnamese"],
-  weight: ["600", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-brand",
 });
 
@@ -43,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" className="bg-background">
-      <body className={`font-sans antialiased ${nunito.variable}`}>
+      <body className={`font-sans antialiased ${lexendDeca.variable}`}>
         <AuthProvider>
           {children}
           <Toaster />
