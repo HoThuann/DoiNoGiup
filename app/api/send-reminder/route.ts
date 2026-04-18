@@ -18,7 +18,22 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(req: NextRequest) {
   try {
-    const { debtorName, debtorEmail, amount, currency, schedule, message, senderName } = await req.json()
+    const { debtorName, debtorEmail, amount, currency, schedule, message, senderName, qrImage } = await req.json()
+
+    // Tạo phần QR trong email nếu có
+    const qrSection = qrImage
+      ? `
+        <!-- QR Code -->
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;">
+          <tr>
+            <td style="background:#f9fafb;border:2px dashed #d4d4d8;border-radius:8px;padding:20px;text-align:center;">
+              <p style="margin:0 0 12px;font-size:13px;color:#71717a;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Quét mã để chuyển khoản nhanh</p>
+              <img src="${qrImage}" alt="QR thanh toán" width="180" height="180" style="border-radius:8px;border:2px solid #e4e4e7;display:block;margin:0 auto;" />
+              <p style="margin:12px 0 0;font-size:13px;color:#71717a;">📸 Mở app ngân hàng và quét mã QR trên</p>
+            </td>
+          </tr>
+        </table>`
+      : ""
 
     await transporter.sendMail({
       from: `"${senderName || "Đòi Nợ Thân Thiện"} via Đòi Nợ Thân Thiện" <${process.env.GMAIL_USER}>`,
@@ -72,7 +87,9 @@ export async function POST(req: NextRequest) {
                 <p style="margin:0;font-size:15px;color:#18181b;line-height:1.8;white-space:pre-wrap;">${message}</p>
               </div>
 
-              <p style="margin:0 0 28px;font-size:14px;color:#71717a;line-height:1.6;">
+              ${qrSection}
+
+              <p style="margin:24px 0 28px;font-size:14px;color:#71717a;line-height:1.6;">
                 📅 Lịch nhắc: <strong>${scheduleText[schedule] || schedule}</strong>
               </p>
 

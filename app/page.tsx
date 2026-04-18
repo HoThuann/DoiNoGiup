@@ -195,6 +195,7 @@ export default function DebtlyPage() {
           schedule,
           message: editedMessage,
           senderName: user.displayName || "Bạn của bạn",
+          qrImage: qrImage || null,
         }),
       })
 
