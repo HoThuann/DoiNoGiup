@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Nunito } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from "@/components/ui/sonner"
 import { AuthProvider } from "@/components/AuthContext"
@@ -7,9 +7,14 @@ import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const nunito = Nunito({
+  subsets: ["latin", "vietnamese"],
+  weight: ["600", "700", "800", "900"],
+  variable: "--font-brand",
+});
 
 export const metadata: Metadata = {
-  title: 'Debt-ly | Đòi nợ tinh tế',
+  title: 'Đòi Nợ Thân Thiện | Đòi nợ tinh tế',
   description: 'Đòi nợ tinh tế, không hề mất lòng - Hệ thống nhắc nợ tự động thân thiện',
   generator: 'v0.app',
   icons: {
@@ -38,7 +43,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" className="bg-background">
-      <body className="font-sans antialiased">
+      <body className={`font-sans antialiased ${nunito.variable}`}>
         <AuthProvider>
           {children}
           <Toaster />

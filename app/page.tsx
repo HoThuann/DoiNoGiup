@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { History, Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut } from "lucide-react"
+import { Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -186,8 +187,11 @@ export default function DebtlyPage() {
         transition={{ duration: 0.4 }}
         className="border-b-2 border-foreground bg-card/50 backdrop-blur-sm sticky top-0 z-50"
       >
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Debt-ly</h1>
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Image src="/logo.jpg" alt="Đòi nợ thân thiện logo" width={64} height={64} className="rounded-xl shadow-sm" />
+            <h1 className="text-lg font-black tracking-tight text-foreground" style={{ fontFamily: 'var(--font-brand)', fontWeight: 800 }}>Đòi Nợ Thân Thiện</h1>
+          </div>
           <div className="flex items-center gap-2">
             {user ? (
               <>
@@ -274,9 +278,12 @@ export default function DebtlyPage() {
                     <Input
                       id="amount"
                       type="text"
-                      placeholder="Vd: 500000"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="Vd: 500,000"
+                      value={amount ? Number(amount.replace(/,/g, "")).toLocaleString("vi-VN") : ""}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/\./g, "").replace(/,/g, "")
+                        if (/^\d*$/.test(raw)) setAmount(raw)
+                      }}
                       className="border-2 border-foreground focus:ring-2 focus:ring-foreground/20 flex-1"
                     />
                     <div className="flex border-2 border-foreground rounded-md overflow-hidden">

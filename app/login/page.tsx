@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { auth } from "@/lib/firebase"
 import Link from "next/link"
+import Image from "next/image"
 
 // Custom Google SVG Icon
 const GoogleIcon = (props: React.ComponentProps<"svg">) => (
@@ -65,11 +66,11 @@ export default function LoginPage() {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
-              className="text-4xl mb-2"
+              className="flex justify-center mb-3"
             >
-              💸
+              <Image src="/logo.jpg" alt="Đòi Nợ Thân Thiện" width={96} height={96} className="rounded-2xl shadow-md" />
             </motion.div>
-            <CardTitle className="text-3xl font-bold tracking-tight">Debt-ly</CardTitle>
+            <CardTitle className="text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-brand)' }}>Đòi Nợ Thân Thiện</CardTitle>
             <CardDescription className="text-base font-medium mt-2">
               Đăng nhập để bắt đầu hành trình đòi nợ tinh tế
             </CardDescription>
