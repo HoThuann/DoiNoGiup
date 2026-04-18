@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     const { debtorName, debtorEmail, amount, currency, schedule, message, senderName } = await req.json()
 
     await transporter.sendMail({
-      from: `"${senderName || "Debt-ly"} via Debt-ly" <${process.env.GMAIL_USER}>`,
+      from: `"${senderName || "Đòi Nợ Thân Thiện"} via Đòi Nợ Thân Thiện" <${process.env.GMAIL_USER}>`,
       to: debtorEmail,
       subject: `💸 ${senderName || "Một người bạn"} đang nhắc bạn về khoản nợ ${amount} ${currency}`,
       html: `
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Nhắc nợ từ Debt-ly</title>
+  <title>Nhắc nợ từ Đòi Nợ Thân Thiện</title>
 </head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:'Segoe UI',Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:40px 0;">
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
           <!-- Header -->
           <tr>
             <td style="background:#18181b;padding:28px 40px;text-align:center;">
-              <span style="font-size:32px;font-weight:900;color:#ffffff;letter-spacing:-1px;">💸 Debt-ly</span>
+              <span style="font-size:32px;font-weight:900;color:#ffffff;letter-spacing:-1px;">💸 Đòi Nợ Thân Thiện</span>
               <p style="color:#a1a1aa;margin:6px 0 0;font-size:13px;letter-spacing:1px;text-transform:uppercase;">Đòi nợ tinh tế · không hề mất lòng</p>
             </td>
           </tr>
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
           <tr>
             <td style="background:#f4f4f5;border-top:2px solid #e4e4e7;padding:20px 40px;text-align:center;">
               <p style="margin:0;font-size:12px;color:#a1a1aa;">
-                Email được gửi từ <strong>Debt-ly</strong> theo yêu cầu của ${senderName || "người dùng"}.<br/>
+                Email được gửi từ <strong>Đòi Nợ Thân Thiện</strong> theo yêu cầu của ${senderName || "người dùng"}.<br/>
                 Đây là email tự động, vui lòng không reply trực tiếp.
               </p>
             </td>

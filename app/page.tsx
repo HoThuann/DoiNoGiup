@@ -1,10 +1,11 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut } from "lucide-react"
+import { Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut, QrCode, X } from "lucide-react"
 import Image from "next/image"
+import confetti from "canvas-confetti"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -114,7 +115,10 @@ export default function DebtlyPage() {
   const [messageIndex, setMessageIndex] = useState(0)
   const [editedMessage, setEditedMessage] = useState("")
   const [isManuallyEdited, setIsManuallyEdited] = useState(false)
+  const [isShuffling, setIsShuffling] = useState(false)
+  const [qrImage, setQrImage] = useState<string | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
+  const qrInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (!isManuallyEdited) {
@@ -134,13 +138,35 @@ export default function DebtlyPage() {
   }
 
   const handleShufflePreview = () => {
-    setMessageIndex((prev) => (prev + 1) % emailPreviews[mood].length)
-    setIsManuallyEdited(false)
+    setIsShuffling(true)
+    setTimeout(() => {
+      setMessageIndex((prev) => (prev + 1) % emailPreviews[mood].length)
+      setIsManuallyEdited(false)
+      setIsShuffling(false)
+    }, 500)
   }
 
   const handleCopyPreview = () => {
     navigator.clipboard.writeText(editedMessage)
     toast.success("Đã sao chép tin nhắn vào khay nhớ tạm!")
+  }
+
+  const handleQrUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => setQrImage(ev.target?.result as string)
+    reader.readAsDataURL(file)
+  }
+
+  const fireConfetti = () => {
+    confetti({
+      particleCount: 120,
+      spread: 80,
+      origin: { y: 0.6 },
+      colors: ["#C2D8C4", "#ffffff", "#222222", "#a8c9aa", "#e8f0e9"],
+      scalar: 1.1,
+    })
   }
 
   const [isSending, setIsSending] = useState(false)
@@ -178,7 +204,8 @@ export default function DebtlyPage() {
         throw new Error(data.error || "Gửi email thất bại")
       }
 
-      toast.success(`✅ Đã gửi email nhắc nợ tới ${debtorEmail} thành công!`)
+      toast.success(`🎉 Đã gửi lời nhắc thành công tới ${debtorEmail}!`)
+      fireConfetti()
     } catch (err: any) {
       toast.error(err.message || "Có lỗi xảy ra khi gửi email")
     } finally {
@@ -247,8 +274,8 @@ export default function DebtlyPage() {
         className="max-w-5xl mx-auto px-4 pb-16"
       >
         <div className="grid md:grid-cols-2 gap-6">
-          <motion.div variants={cardVariants}>
-            <Card className="border-2 border-foreground shadow-[4px_4px_0px_0px_#222222] bg-card">
+          <motion.div variants={cardVariants} whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
+            <Card className="border-2 border-foreground shadow-[4px_4px_0px_0px_#222222] hover:shadow-[6px_6px_0px_0px_#222222] transition-shadow bg-card">
               <CardHeader className="border-b-2 border-foreground">
                 <CardTitle className="text-xl font-bold">Thông tin người nợ</CardTitle>
               </CardHeader>
@@ -322,6 +349,42 @@ export default function DebtlyPage() {
                       </button>
                     </div>
                   </div>
+                </div>
+
+                {/* QR Upload */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-semibold flex items-center gap-2">
+                    <QrCode className="w-4 h-4" />
+                    Mã QR thanh toán của bạn (tuỳ chọn)
+                  </Label>
+                  <input
+                    ref={qrInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleQrUpload}
+                  />
+                  {qrImage ? (
+                    <div className="relative inline-block">
+                      <img src={qrImage} alt="QR thanh toán" className="w-32 h-32 rounded-lg border-2 border-foreground object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => { setQrImage(null); if (qrInputRef.current) qrInputRef.current.value = "" }}
+                        className="absolute -top-2 -right-2 bg-foreground text-background rounded-full w-5 h-5 flex items-center justify-center"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => qrInputRef.current?.click()}
+                      className="w-full border-2 border-dashed border-foreground/40 rounded-lg p-4 text-sm text-muted-foreground hover:border-foreground hover:bg-muted/30 transition-all flex flex-col items-center gap-1"
+                    >
+                      <QrCode className="w-6 h-6" />
+                      <span>Upload ảnh mã QR ngân hàng của bạn</span>
+                    </button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -402,8 +465,8 @@ export default function DebtlyPage() {
             </Card>
           </motion.div>
 
-          <motion.div variants={cardVariants} ref={previewRef}>
-            <Card className="border-2 border-foreground shadow-[4px_4px_0px_0px_#222222] bg-card">
+          <motion.div variants={cardVariants} ref={previewRef} whileHover={{ y: -4 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
+            <Card className="border-2 border-foreground shadow-[4px_4px_0px_0px_#222222] hover:shadow-[6px_6px_0px_0px_#222222] transition-shadow bg-card">
               <CardHeader className="border-b-2 border-foreground">
                 <CardTitle className="text-xl font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
@@ -432,23 +495,56 @@ export default function DebtlyPage() {
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6">
-                <motion.div
-                  key={mood + messageIndex}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Textarea
-                    value={editedMessage}
-                    onChange={(e) => {
-                      setEditedMessage(e.target.value)
-                      setIsManuallyEdited(true)
-                    }}
-                    className="min-h-[220px] bg-muted/50 border-2 border-dashed border-foreground/30 rounded-md p-4 text-base font-sans leading-relaxed text-foreground resize-y focus-visible:ring-2 focus-visible:ring-foreground/20 focus-visible:border-foreground"
-                    placeholder="Nhập nội dung nhắc nợ..."
-                  />
-                </motion.div>
+              <CardContent className="pt-6 space-y-4">
+                <AnimatePresence mode="wait">
+                  {isShuffling ? (
+                    <motion.div
+                      key="skeleton"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="space-y-3"
+                    >
+                      {["w-3/4", "w-full", "w-5/6", "w-full", "w-2/3", "w-4/5"].map((w, i) => (
+                        <div
+                          key={i}
+                          className={`h-4 rounded-md animate-pulse ${w}`}
+                          style={{ backgroundColor: "#C2D8C4" }}
+                        />
+                      ))}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key={mood + messageIndex}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Textarea
+                        value={editedMessage}
+                        onChange={(e) => {
+                          setEditedMessage(e.target.value)
+                          setIsManuallyEdited(true)
+                        }}
+                        className="min-h-[220px] bg-muted/50 border-2 border-dashed border-foreground/30 rounded-md p-4 text-base font-sans leading-relaxed text-foreground resize-y focus-visible:ring-2 focus-visible:ring-foreground/20 focus-visible:border-foreground"
+                        placeholder="Nhập nội dung nhắc nợ..."
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* QR Preview in message */}
+                {qrImage && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col items-center gap-2 border-2 border-dashed border-foreground/30 rounded-lg p-4 bg-muted/30"
+                  >
+                    <img src={qrImage} alt="QR thanh toán" className="w-36 h-36 rounded-lg object-cover border-2 border-foreground/20" />
+                    <p className="text-sm font-medium text-muted-foreground">Quét mã để chuyển khoản nhanh nhé! 📸</p>
+                  </motion.div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
