@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { Resend } from "resend"
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+import nodemailer from "nodemailer"
 
 const scheduleText: Record<string, string> = {
   daily: "mỗi ngày",
@@ -9,13 +7,22 @@ const scheduleText: Record<string, string> = {
   weekly: "mỗi tuần",
 }
 
+// Khởi tạo Gmail SMTP transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+})
+
 export async function POST(req: NextRequest) {
   try {
     const { debtorName, debtorEmail, amount, currency, schedule, message, senderName } = await req.json()
 
-    const { data, error } = await resend.emails.send({
-      from: "Debt-ly <onboarding@resend.dev>",
-      to: [debtorEmail],
+    await transporter.sendMail({
+      from: `"${senderName || "Debt-ly"} via Debt-ly" <${process.env.GMAIL_USER}>`,
+      to: debtorEmail,
       subject: `💸 ${senderName || "Một người bạn"} đang nhắc bạn về khoản nợ ${amount} ${currency}`,
       html: `
 <!DOCTYPE html>
@@ -94,14 +101,9 @@ export async function POST(req: NextRequest) {
       `.trim()
     })
 
-    if (error) {
-      console.error("Resend error:", error)
-      return NextResponse.json({ error: error.message }, { status: 400 })
-    }
-
-    return NextResponse.json({ success: true, id: data?.id })
+    return NextResponse.json({ success: true })
   } catch (err: any) {
-    console.error("API error:", err)
-    return NextResponse.json({ error: err.message || "Lỗi server" }, { status: 500 })
+    console.error("Gmail SMTP error:", err)
+    return NextResponse.json({ error: err.message || "Lỗi gửi email" }, { status: 500 })
   }
 }
