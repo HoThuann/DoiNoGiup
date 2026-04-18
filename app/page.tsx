@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut, QrCode, X, Moon, Sun } from "lucide-react"
+import { Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut, QrCode, X, Moon, Sun, BookOpen } from "lucide-react"
 import Image from "next/image"
 import confetti from "canvas-confetti"
 import { useTheme } from "next-themes"
@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { useAuth } from "@/components/AuthContext"
 import { auth } from "@/lib/firebase"
@@ -43,6 +44,11 @@ const emailPreviews: Record<Mood, Array<(name: string, amount: string, currency:
     (name, amount, currency) => `Psst psst... ${name || "ê cậu"} ơi! 🤭\n\nTớ không muốn làm phiền đâu nhưng mà... cậu có nhớ hôm bữa tớ cho cậu mượn ${amount || "xxx"} ${currency} không?\n\nKhông sao hết, tớ just saying thôi á! Tiện thì trả nha cậu ơiiii 💌\n\nMãi thương cậu~`,
     (name, amount, currency) => `🌟 Tin nhắn đặc biệt dành cho ${name || "người bạn xinh đẹp của tui"}!\n\nNội dung: ${amount || "xxx"} ${currency} đang nhớ cậu lắm á và muốn về nhà (là ví của tớ) 😆\n\nBao giờ cậu rảnh thì cho nó về nha! Tớ đãi cậu trà sữa sau 🧋\n\nXOXO 💋`,
     (name, amount, currency) => `Cậu ơi cậu ơi cậu ơi! 🙈\n\nTớ vừa xem lại sổ nợ (có, tớ có sổ nợ thật đó!) thì ra là cậu đang nợ tớ ${amount || "xxx"} ${currency} nè.\n\nỪ thì cậu bận tớ hiểu, nhưng mà lúc nào đó nhớ gửi lại tớ nghen! Không cần gấp đâu... à mà gấp một chút cũng được 🤣\n\nBff forever~ 🌈`,
+    (name, amount, currency) => `Ting ting 🔔 Có người gửi cho ${name || "ấy"} một rổ yêu thương nè!\n\nKèm theo đó là chiếc bill nhỏ xinh ${amount || "xxx"} ${currency} đang ngóng chờ cậu thanh toán. Mau độp lại bằng một quả chuyển khoản nổ banh xác nha! 💥\n\nIu cục cưng nhiều!`,
+    (name, amount, currency) => `Cảnh báo cục súc nhưng dễ thương! 🚨\n\nKhẩn cấp: ${amount || "xxx"} ${currency} đang cầu cứu vì xa chủ quá lâu! ${name || "Tên kia"} hãy mau mau phóng sinh ẻm về đi!!! 🤌\n\nMình đùa đó, rảnh thì gửi hén ~ Nhớ lắm nha.`,
+    (name, amount, currency) => `Trắc nghiệm vui nho nhỏ cho ${name || "ai đó"} nhó 📝\n\nCâu 1: Câu có đang nợ tớ ${amount || "xxx"} ${currency} không?\n👉 A. Có\n👉 B. Phải có chứ trốn đường nào!\n\nĐáp án nào cũng đúng hết nha, tớ chỉ đợi tiếng "Ting ting" thôi nè 🤩`,
+    (name, amount, currency) => `Alo 1234, tổng đài tình bạn xin nghe 📞\n\nQuý khách ${name || "bạn thân"} có 1 khoản thanh toán ${amount || "xxx"} ${currency} chưa thành công. Vui lòng nạp thêm độ "uy tín" bằng cách chuyển khoản sớm nhất nhe!\n\nCảm ơn quý khách đã sử dụng dịch vụ 😘!`,
+    (name, amount, currency) => `Dạo này trời hay mưa ghê á 🌧️\n\nTự nhiên thèm ăn lẩu ghê, mà ví tui lại vơi đi mất ${amount || "xxx"} ${currency} do đang nằm bên túi ${name || "ấy"} á... Huhu... Trả tui ăn lẩu điii!!! 🍲\n\nHoặc là... cậu khao tớ ăn lẩu lại nhé? Deal! 🙌`,
   ],
   humble: [
     (name, amount, currency) => `Chào ${name || "bạn"} ơi,\n\nMình viết mail này hơi ngại xíu... Nhưng mà mình muốn nhắc nhẹ về khoản ${amount || "xxx"} ${currency} nha.\n\nMình hiểu cậu cũng có lúc khó khăn, nhưng nếu được thì cậu sắp xếp giúp mình nghen. Mình cảm ơn cậu rất nhiều!\n\nChúc cậu một ngày tốt lành,\nNgười bạn của cậu`,
@@ -52,6 +58,11 @@ const emailPreviews: Record<Mood, Array<(name: string, amount: string, currency:
     (name, amount, currency) => `Xin chào ${name || "bạn"},\n\nMình nhắn tin này sau một hồi đắn đo, vì thực ra mình không muốn khoản tiền ${amount || "xxx"} ${currency} ảnh hưởng đến tình cảm giữa hai đứa.\n\nBạn cứ từ từ sắp xếp theo khả năng, mình không vội. Chỉ cần bạn nhớ và có kế hoạch là mình yên tâm rồi.\n\nCảm ơn bạn đã hiểu mình,`,
     (name, amount, currency) => `${name || "Bạn"} thân mến,\n\nDạo này bạn có khoẻ không? Mình hỏi thăm và cũng nhân tiện nhắc nhẹ về khoản ${amount || "xxx"} ${currency} mình đã hỗ trợ bạn trước đây.\n\nMình tin bạn không quên, chỉ là cuộc sống bận bịu thôi. Khi nào bạn sắp xếp được hãy báo mình nhé.\n\nVẫn luôn là bạn tốt của nhau,`,
     (name, amount, currency) => `Gửi đến ${name || "người bạn của mình"},\n\nMình gửi tin nhắn này với một chút ngại ngùng, nhưng tình bạn thật sự là phải thẳng thắn với nhau đúng không?\n\nKhoản ${amount || "xxx"} ${currency} đã được một thời gian rồi, mình cũng đang có chút cần dùng đến. Bạn thông cảm và hỗ trợ mình nhé.\n\nMãi yêu quý bạn,`,
+    (name, amount, currency) => `Chào ${name || "bạn"} của mình,\n\nHy vọng mọi việc của bạn dạo này đều suôn sẻ. Mình chỉ muốn hỏi nhỏ về khoản ${amount || "xxx"} ${currency} hôm trước.\n\nBạn sắp xếp rảnh rỗi lúc nào thì cứ "ting ting" mình một nhịp nha. Chúc bạn một tháng mới bình an!\n\nThân ái,`,
+    (name, amount, currency) => `Gửi ${name || "bạn"},\n\nMình rất xin lỗi nếu tin nhắn này làm phiền công việc hiện tại của bạn. Cứ mỗi lần nhắc nợ là mình lại thấy... khó xử lây 😅\n\nBạn xem nếu tiện thì sắp xếp cho mình xin lại số tiền ${amount || "xxx"} ${currency} nhé. Rất mong sự phản hồi từ bạn!\n\nCảm ơn bạn nhiều,`,
+    (name, amount, currency) => `${name || "Bạn"} ơi, mình vừa rà lại các chi khoản thì nhớ ra còn khoản ${amount || "xxx"} ${currency} chỗ bạn chưa hoàn tất.\n\nMình sợ mình quên nên đành mạnh dạn nhắn. Nếu chưa kẹt quá thì cho mình xin lại nhé. Nếu đang khó khăn thì bạn cứ báo mình một câu là được.\n\nThông cảm cho mình nha,`,
+    (name, amount, currency) => `Lời chào thân thiết gửi tới ${name || "bạn"},\n\nMình viết tin nhắn này với sự chân thành tuyệt đối. Cuộc sống dạo này kinh tế có chút khó khăn gõ cửa phòng mình, nên mình cũng đang cần dùng tới khoản ${amount || "xxx"} ${currency} của tụi mình đợt trước.\n\nMình sẽ biết ơn lắm nếu bạn xoay xở gửi sớm cho mình. Cảm ơn bạn!\n\nTrân trọng,`,
+    (name, amount, currency) => `Gửi ${name || "người anh em/chị em"},\n\nThật sự là chuyện tiền bạc thường khó nói, nhưng thôi anh/chị em cứ thẳng thắn cho dễ sống ha.\n\nBạn sắp xếp dứt điểm khoản ${amount || "xxx"} ${currency} giúp mình khi tiện nhé. Cảm ơn tình bạn của chúng ta!\n\nChúc một tuần làm việc hiệu quả,`,
   ],
   professional: [
     (name, amount, currency) => `Kính gửi ${name || "Anh/Chị"},\n\nTôi xin phép gửi email này để nhắc nhở về khoản thanh toán ${amount || "xxx"} ${currency} đến hạn.\n\nRất mong Anh/Chị sắp xếp thời gian thuận tiện để hoàn tất giao dịch. Nếu có thắc mắc, xin vui lòng liên hệ lại với tôi.\n\nTrân trọng,\n[Tên của bạn]`,
@@ -61,9 +72,40 @@ const emailPreviews: Record<Mood, Array<(name: string, amount: string, currency:
     (name, amount, currency) => `Thông báo nhắc nợ\n\nKính gửi: ${name || "Anh/Chị"}\nSố tiền: ${amount || "xxx"} ${currency}\nTrạng thái: Chưa thanh toán\n\nChúng tôi ghi nhận rằng khoản thu kể trên vẫn chưa được xử lý. Đề nghị Anh/Chị kiểm tra và phản hồi trong vòng 3-5 ngày làm việc.\n\nMọi thắc mắc xin liên hệ trực tiếp để được hỗ trợ.\n\nTrân trọng,`,
     (name, amount, currency) => `Kính gửi ${name || "Anh/Chị"},\n\nNhân dịp rà soát định kỳ, chúng tôi nhận thấy khoản thanh toán ${amount || "xxx"} ${currency} vẫn đang ở trạng thái chưa hoàn tất.\n\nChúng tôi đánh giá cao mối quan hệ hợp tác lâu dài và tin tưởng đây chỉ là sơ sót nhỏ. Kính mong Anh/Chị sắp xếp thanh toán sớm để duy trì uy tín và quan hệ đôi bên.\n\nTrân trọng cảm ơn,`,
     (name, amount, currency) => `THÔNG BÁO NHẮC THANH TOÁN\n\nKính gửi: ${name || "Anh/Chị"}\n\nĐây là thông báo thứ [số lần] nhắc nhở về khoản thanh toán ${amount || "xxx"} ${currency} đã quá hạn.\n\nĐề nghị Anh/Chị thực hiện thanh toán ngay hoặc liên hệ để thỏa thuận phương án giải quyết phù hợp. Sự chậm trễ có thể ảnh hưởng đến uy tín hợp tác của hai bên.\n\nNghiêm túc trân trọng,`,
+    (name, amount, currency) => `Kính gửi ${name || "Anh/Chị/Đại diện"},\n\nChúng tôi xin thông báo về biên bản đối chiếu công nợ của kỳ trước, trong đó số dư ${amount || "xxx"} ${currency} vẫn đang treo nợ và chưa có uỷ nhiệm chi thanh toán mới.\n\nKính đề nghị quý vị cập nhật tiến độ thanh toán để bộ phận kế toán của chúng tôi được hạch toán đầy đủ.\n\nChân thành ghi nhận sự hỗ trợ,`,
+    (name, amount, currency) => `Cập nhật Tình trạng Giao dịch Khẩn,\n\nChào ${name || "Anh/Chị"},\n\nKhoản thanh toán trị giá ${amount || "xxx"} ${currency} hiện đã vượt quá mốc thời gian linh động chi trả (Grace Period).\n\nYêu cầu Anh/Chị xúc tiến giao dịch ngay lập tức trong phiên làm việc kế tiếp. Sự chậm trễ thêm có thể kích hoạt các khoản phí phụ đính theo quy định chung.\n\nCảm ơn Anh/Chị đã ưu tiên giải quyết,`,
+    (name, amount, currency) => `Kính thư nhắc nợ định kỳ,\n\nGửi ${name || "Quý khách"},\n\nTheo quy trình của phòng Kế toán, chúng tôi tiến hành xuất báo cáo khoản tồn đọng: ${amount || "xxx"} ${currency}.\n\nĐể đảm bảo quá trình cung ứng dịch vụ không bị gián đoạn, phiền Anh/Chị thu xếp đối soát chứng từ và làm lệnh chuyển tiền. Rất mong nhận được phản hồi xác nhận từ phía Anh/Chị.\n\nTrân trọng kính thư,`,
+    (name, amount, currency) => `Gửi ${name || "Đối tác"},\n\nTiếp nối những trao đổi công việc vừa qua, tôi xin được ghi chú thêm một mục quan trọng về hóa đơn chưa thanh lý với tỷ giá ${amount || "xxx"} ${currency}.\n\nĐể mọi công việc giữa hai bên luôn suôn sẻ trôi chảy, Anh/Chị vui lòng lên lịch thanh toán trong tuần này.\n\nCảm ơn sự tín nhiệm của Anh/Chị,\nBộ phận Quản lý dòng tiền`,
+    (name, amount, currency) => `THÔNG BÁO CUỐI THEO CHU KỲ\n\nKính thưa ${name || "Quý Cấp"},\n\nChúng tôi chưa nhận được báo có cho số tiền ${amount || "xxx"} ${currency} tại thời điểm rà soát công nợ hiện hữu.\n\nĐây là thông báo mang tính chất nhắc nhở hành chính. Kính mong Quý vị rà soát và khắc phục trong vòng 48h để công tác kế toán cuối tháng được bảo đảm.\n\nTrân trọng chuyển lời nhắn,`,
   ],
 }
 
+const heroContents = [
+  {
+    title: "Đòi nợ tinh tế, không hề mất lòng.",
+    subtitle: "Chill thôi~ \"Để Đòi nợ thân thiện lo!\" Tự động gửi tin nhắn nhắc nợ siêu cute, không awkward, bạn bè vẫn thân"
+  },
+  {
+    title: "Mượn tiền dễ dàng, đòi tiền thanh lịch.",
+    subtitle: "Xoá tan nỗi lo sứt mẻ tình cảm mỗi khi nhắc nợ. Gửi thông điệp khéo léo giúp tốc độ hoàn tiền tới tay nhanh gấp đôi!"
+  },
+  {
+    title: "Ngại mở lời? Cứ để máy lo!",
+    subtitle: "Quên đi những status bâng quơ trên mạng xã hội. Một chiếc email dễ thương sẽ khiến người bạn kia chủ động ting ting cho bạn ngay."
+  },
+  {
+    title: "Đòi nợ 4.0 - Không đau đầu, không stress.",
+    subtitle: "Gửi thông điệp tự động chỉ với 1 cú click. Giữ trọn sự thanh lịch, bỏ qua nỗi sợ phải soạn những đoạn chat ngượng ngùng dông dài."
+  },
+  {
+    title: "Đừng để đồng tiền làm sứt mẻ tình anh em!",
+    subtitle: "Thư viện tin nhắn từ cực kỳ đáng yêu đến nghiêm túc chuyên nghiệp. Chạm nhẹ là gửi, để đối phương tự giác hoàn tiền trong vui vẻ."
+  },
+  {
+    title: "Người ta múa quạt, bạn thì 'múa bill'.",
+    subtitle: "Tích hợp sẵn hình ảnh mã QR ngân hàng cực kỳ tiện lợi vào email. Đối phương chỉ cần giơ máy lên quét phát là tiền về tay ngay tức thì!"
+  }
+]
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -156,7 +198,9 @@ export default function DebtlyPage() {
   const [mood, setMood] = useState<Mood>("cute")
   const [schedule, setSchedule] = useState<Schedule>("every3days")
 
+  const [heroIndex, setHeroIndex] = useState(0)
   const [messageIndex, setMessageIndex] = useState(0)
+  const [isBrowserOpen, setIsBrowserOpen] = useState(false)
   const [editedMessage, setEditedMessage] = useState("")
   const [isManuallyEdited, setIsManuallyEdited] = useState(false)
   const [isShuffling, setIsShuffling] = useState(false)
@@ -170,6 +214,13 @@ export default function DebtlyPage() {
       setEditedMessage(template(debtorName, amount, currency))
     }
   }, [debtorName, amount, currency, mood, messageIndex, isManuallyEdited])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % heroContents.length)
+    }, 10000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleMoodSelect = (selectedMood: Mood) => {
     setMood(selectedMood)
@@ -324,19 +375,30 @@ export default function DebtlyPage() {
         variants={heroVariants}
         initial="hidden"
         animate="visible"
-        className="max-w-5xl mx-auto px-4 pt-12 pb-8 text-center relative z-10"
+        className="max-w-5xl mx-auto px-4 pt-12 pb-8 text-center relative z-10 min-h-[180px] flex items-center justify-center"
       >
-        <motion.h2 
-          className="text-4xl md:text-5xl text-primary mb-4 text-balance text-center drop-shadow-sm" 
-          style={{ fontWeight: 700, fontFamily: 'var(--font-brand)' }}
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        >
-          Đòi nợ tinh tế, không hề mất lòng.
-        </motion.h2>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
-          Chill thôi~ "Để Đòi nợ thân thiện lo!" Tự động gửi tin nhắn nhắc nợ siêu cute, không awkward, bạn bè vẫn thân
-        </p>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={heroIndex}
+            initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="w-full"
+          >
+            <motion.h2 
+              className="text-4xl md:text-5xl text-primary mb-4 text-balance text-center drop-shadow-sm" 
+              style={{ fontWeight: 700, fontFamily: 'var(--font-brand)' }}
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              {heroContents[heroIndex].title}
+            </motion.h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">
+              {heroContents[heroIndex].subtitle}
+            </p>
+          </motion.div>
+        </AnimatePresence>
       </motion.section>
 
       <motion.main
@@ -526,6 +588,47 @@ export default function DebtlyPage() {
                     </motion.div>
                   ))}
                 </RadioGroup>
+                
+                <div className="mt-4 flex justify-end">
+                  <Dialog open={isBrowserOpen} onOpenChange={setIsBrowserOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" className="text-primary hover:text-primary hover:bg-primary/10 font-semibold gap-2 border border-transparent hover:border-primary/20 transition-all">
+                        <BookOpen className="w-4 h-4" />
+                        Xem kho tin nhắn {moodLabels[mood].label.split('/')[0]}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-background border-2 border-primary shadow-[8px_8px_0px_0px_var(--color-primary)]">
+                      <DialogHeader>
+                        <DialogTitle className="text-2xl font-bold text-primary flex items-center gap-2">
+                          <BookOpen className="w-6 h-6" /> Kho tin nhắn mẫu
+                        </DialogTitle>
+                        <DialogDescription className="text-base text-muted-foreground">
+                          Chọn một mẫu tin nhắn {moodLabels[mood].label.toLowerCase().split('/')[0]} phù hợp nhất với tình huống của bạn.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 mt-4">
+                        {emailPreviews[mood].map((template, idx) => (
+                          <div 
+                            key={idx} 
+                            onClick={() => {
+                              setMessageIndex(idx)
+                              setIsManuallyEdited(false)
+                              setIsBrowserOpen(false)
+                              setTimeout(() => {
+                                previewRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+                              }, 150)
+                            }}
+                            className={`p-4 rounded-xl border-2 cursor-pointer transition-all hover:translate-y-[-2px] ${messageIndex === idx ? 'border-primary bg-primary/10 shadow-[4px_4px_0px_0px_var(--color-primary)]' : 'border-border bg-card hover:border-primary/50 hover:shadow-[4px_4px_0px_0px_var(--color-border)]'}`}
+                          >
+                            <p className="whitespace-pre-wrap text-sm text-foreground/90 font-medium">
+                              {template(debtorName || "[Tên bạn nợ]", amount || "[Số tiền]", currency)}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -559,6 +662,13 @@ export default function DebtlyPage() {
                     </motion.div>
                   ))}
                 </RadioGroup>
+                
+                <div className="mt-4 p-3 bg-primary/10 border border-primary/20 rounded-lg flex gap-3 items-start">
+                  <span className="text-xl leading-none pt-0.5">🤫</span>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    <strong>Bật mí nhỏ:</strong> Lịch nhắc này chỉ là một <span className="font-bold text-primary">"cú lừa tâm lý"</span> siêu cấp đáng yêu giúp đẩy nhanh tốc độ hoàn tiền thôi nha. Nhằm giữ tình cảm bạn bè, hệ thống thực chất chỉ gửi <strong>01 email duy nhất</strong> chứ không hề "spam" như những gì hiển thị đâu!
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </motion.div>
