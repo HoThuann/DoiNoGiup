@@ -1,4 +1,4 @@
-import { google } from '@ai-sdk/google';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText, convertToModelMessages } from 'ai';
 
 // Allow streaming responses up to 30 seconds
@@ -7,7 +7,6 @@ export const maxDuration = 30;
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Incoming Chat API Body:", body);
     const { messages } = body;
     const systemPrompt = `Bạn là "Trợ Lý Đòi Nợ" siêu ngầu, trẻ trung và cực kỳ tự nhiên.
 Tùy vào câu nói của người dùng mà bạn phản hồi theo 2 trường hợp sau:
@@ -21,15 +20,18 @@ TRƯỜNG HỢP 2: Người dùng nhờ đòi nợ, tức giận vì bị bùng 
 - CẤP MẪU COPY/PASTE: Sinh ra 2 mẫu tin nhắn (1 giữ hoà khí, 1 cứng rắn/móc mỉa). Mỗi mẫu tối đa 3-4 dòng cực ngắn.
 - PR KHÉO: Cuối cùng, mới chèn 1 câu rất mượt: "Vẫn lầy quá thì setting 'Nhắc bao lâu 1 lần' trên web cho hệ thống tự spam thay bạn nhé =))"`;
 
-    // Gọi Gemini API thông qua AI SDK
+    // Khởi tạo Gemini AI với Model 2.5 Flash đời mới nhất
     const modelMsgs = await convertToModelMessages(messages);
+    const google = createGoogleGenerativeAI({
+      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+    });
+
     const result = await streamText({
       model: google('gemini-2.5-flash'),
       system: systemPrompt,
       messages: modelMsgs,
     });
 
-    console.log("streamText successful");
     return result.toUIMessageStreamResponse();
   } catch (error: any) {
     console.error("AI Chat Error:", error);

@@ -78,6 +78,7 @@ export default function ChatWidget() {
     },
   })
 
+
   const isLoading = status === "streaming" || status === "submitted"
 
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -248,10 +249,9 @@ export default function ChatWidget() {
                 </div>
               )}
 
-              {/* Error state */}
               {error && (
                 <div className="text-center text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg px-3 py-2">
-                  ⚠️ Có lỗi xảy ra. Kiểm tra lại API Key trong .env.local nhé!
+                  ⚠️ {error.message || "Có lỗi xảy ra khi kết nối với AI"}
                 </div>
               )}
             </div>
@@ -307,23 +307,79 @@ export default function ChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Floating Toggle Button */}
+      {/* Floating Toggle Button (Minimalist Robot Head Redesign) */}
       <motion.button
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.92 }}
+        whileHover="hover"
+        whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
         id="chat-toggle-btn"
         aria-label={isOpen ? "Đóng chat" : "Mở trợ lý AI"}
-        className="fixed bottom-6 right-4 sm:right-6 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-[0_8px_25px_rgba(0,0,0,0.2)] flex items-center justify-center z-[100] transition-shadow hover:shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
+        className="fixed bottom-6 right-4 sm:right-6 w-20 h-20 bg-[#222222] rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.4)] flex items-center justify-center z-[100] border border-white/5 transition-all duration-500 overflow-visible"
+        style={{ fontFamily: "'Lexend Deca', sans-serif" }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
-            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}>
-              <X className="w-6 h-6" />
+            <motion.div 
+              key="close" 
+              initial={{ opacity: 0, scale: 0.5 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              exit={{ opacity: 0, scale: 0.5 }} 
+              transition={{ duration: 0.2 }}
+            >
+              <X className="w-8 h-8 text-[#C2D8C4]" />
             </motion.div>
           ) : (
-            <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}>
-              <MessageSquare className="w-6 h-6" />
+            <motion.div 
+              key="robot" 
+              initial={{ scale: 0.5, opacity: 0 }} 
+              animate={{ scale: 1, opacity: 1 }} 
+              className="relative w-full h-full flex items-center justify-center"
+            >
+              {/* Pulsating Outer Glow on Hover */}
+              <motion.div
+                variants={{
+                  hover: { 
+                    opacity: 1,
+                    scale: [1, 1.1, 1],
+                    transition: { repeat: Infinity, duration: 2 }
+                  }
+                }}
+                initial={{ opacity: 0 }}
+                className="absolute inset-0 rounded-full bg-[#C2D8C4]/20 blur-xl pointer-events-none"
+              />
+
+              {/* Minimalist Robot Head SVG */}
+              <motion.svg 
+                viewBox="0 0 24 24" 
+                className="w-10 h-10 text-[#C2D8C4] fill-none stroke-current"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                variants={{
+                  hover: { 
+                    filter: "brightness(1.3) drop-shadow(0 0 8px rgba(194, 216, 196, 0.8))",
+                    scale: 1.1
+                  }
+                }}
+              >
+                {/* Head Shape */}
+                <path d="M7 8h10a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z" />
+                {/* Eyes */}
+                <circle cx="9" cy="13" r="1" fill="currentColor" />
+                <circle cx="15" cy="13" r="1" fill="currentColor" />
+                {/* Antenna */}
+                <path d="M12 8V5M10 5h4" />
+                {/* Sparkle Icon Incorporated */}
+                <motion.path 
+                  d="M19 5l-1.5 1.5M19 5l1.5 1.5M19 5l-1.5-1.5M19 5l1.5-1.5" 
+                  strokeWidth="1"
+                  animate={{ opacity: [0.4, 1, 0.4] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                />
+              </motion.svg>
+
+              {/* Sleek Online dot (Top-left) */}
+              <div className="absolute top-4 left-4 w-2 h-2 bg-[#C2D8C4] rounded-full shadow-[0_0_8px_rgba(194,216,196,0.8)] z-20" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -333,10 +389,10 @@ export default function ChatWidget() {
           {hasUnread && !isOpen && (
             <motion.span
               key="badge"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center"
+              initial={{ scale: 0, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0, y: 10 }}
+              className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center z-[110] shadow-md border border-[#222222]"
             >
               1
             </motion.span>
