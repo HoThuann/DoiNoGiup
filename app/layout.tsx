@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from "@/components/ui/sonner"
 import { AuthProvider } from "@/components/AuthContext"
 import { ThemeProvider } from "@/components/theme-provider"
+import ChatWidget from "@/components/ChatWidget"
 import './globals.css'
 
 const _geist = { subsets: ["latin"] }; // unused, keeping import to avoid breaking
@@ -48,6 +49,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
             {children}
+            <ChatWidget />
             <Toaster />
           </AuthProvider>
         </ThemeProvider>

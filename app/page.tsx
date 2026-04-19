@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useRouter } from "next/navigation"
-import { Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut, QrCode, X, Moon, Sun, BookOpen } from "lucide-react"
+import { Mail, User, DollarSign, Sparkles, Heart, Briefcase, Calendar, Send, Eye, RefreshCw, Copy, LogIn, LogOut, QrCode, X, Moon, Sun, BookOpen, Wand2 } from "lucide-react"
 import Image from "next/image"
 import confetti from "canvas-confetti"
 import { useTheme } from "next-themes"
@@ -203,6 +203,7 @@ export default function DebtlyPage() {
   const [isBrowserOpen, setIsBrowserOpen] = useState(false)
   const [editedMessage, setEditedMessage] = useState("")
   const [isManuallyEdited, setIsManuallyEdited] = useState(false)
+  const [isAiWriting, setIsAiWriting] = useState(false)
   const [isShuffling, setIsShuffling] = useState(false)
   const [qrImage, setQrImage] = useState<string | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
@@ -244,6 +245,36 @@ export default function DebtlyPage() {
   const handleCopyPreview = () => {
     navigator.clipboard.writeText(editedMessage)
     toast.success("Đã sao chép tin nhắn vào khay nhớ tạm!")
+  }
+
+  const handleAiGenerate = async () => {
+    if (!debtorName || !amount) {
+      toast.warning("Vui lòng điền Tên và Số tiền trước để AI có thể viết nha!")
+      return
+    }
+    setIsAiWriting(true)
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          debtorName,
+          amount,
+          currency,
+          mood: moodLabels[mood].label,
+        }),
+      })
+
+      if (!res.ok) throw new Error("Lỗi API")
+      const data = await res.json()
+      setEditedMessage(data.text)
+      setIsManuallyEdited(true)
+      toast.success("AI đã soạn xong 1 bài tuyệt tác! 🪄")
+    } catch (err) {
+      toast.error("Có lỗi khi gọi AI. Quên thêm API Key chăng?")
+    } finally {
+      setIsAiWriting(false)
+    }
   }
 
   const handleQrUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -681,7 +712,21 @@ export default function DebtlyPage() {
                     <Eye className="w-5 h-5" />
                     Xem trước tin nhắn
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleAiGenerate}
+                        disabled={isAiWriting}
+                        className="group relative overflow-hidden border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground focus:ring-2 focus:ring-primary/20 transition-all font-semibold h-8 disabled:opacity-50 shadow-[2px_2px_0px_0px_var(--color-primary)]"
+                      >
+                        <span className="relative z-10 flex items-center">
+                          <Wand2 className={`w-3.5 h-3.5 mr-1 ${isAiWriting ? "animate-pulse" : "group-hover:rotate-12 transition-transform"}`} />
+                          {isAiWriting ? "Đang ráp chữ..." : "AI viết hộ"}
+                        </span>
+                      </Button>
+                    </motion.div>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button
                         variant="outline"
