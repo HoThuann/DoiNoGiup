@@ -1,4 +1,4 @@
-import { google } from '@ai-sdk/google';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateText } from 'ai';
 
 export async function POST(req: Request) {
@@ -11,6 +11,20 @@ export async function POST(req: Request) {
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
+
+    // Kiểm tra API Key trước khi khởi tạo
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (!apiKey) {
+      console.error("CRITICAL: GOOGLE_GENERATIVE_AI_API_KEY is not defined in environment variables.");
+      return new Response(
+        JSON.stringify({ error: "API Key của Google AI chưa được cấu hình. Vui lòng kiểm tra lại thiết lập hệ thống." }), 
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const google = createGoogleGenerativeAI({
+      apiKey: apiKey,
+    });
 
     const prompt = `Hãy viết một tin nhắn đòi nợ cho người tên "${debtorName}" với số tiền ${amount} ${currency || 'VND'}. 
 Phong cách: ${mood || 'Cute/Vui vẻ'}.
@@ -35,9 +49,20 @@ Chỉ trả về nội dung tin nhắn, không thêm bình luận nào khác.`;
     );
   } catch (error: any) {
     console.error('AI Generate Error:', error);
+    
+    let errorMessage = "Đã xảy ra lỗi khi tạo tin nhắn. Vui lòng thử lại sau.";
+    
+    if (error.status === 401 || error.status === 403) {
+      errorMessage = "API Key của Google AI không hợp lệ hoặc đã hết hạn. Vui lòng cập nhật lại cấu hình.";
+    } else if (error.status === 429) {
+      errorMessage = "Hệ thống AI đang quá tải (hết quota). Vui lòng đợi một chút rồi thử lại.";
+    } else if (error.message) {
+      errorMessage = `Lỗi AI: ${error.message}`;
+    }
+
     return new Response(
-      JSON.stringify({ error: error.message || 'Lỗi khi gọi AI API' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: errorMessage }),
+      { status: error.status || 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
 }

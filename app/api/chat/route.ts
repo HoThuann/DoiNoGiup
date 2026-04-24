@@ -20,10 +20,20 @@ TRƯỜNG HỢP 2: Người dùng nhờ đòi nợ, tức giận vì bị bùng 
 - CẤP MẪU COPY/PASTE: Sinh ra 2 mẫu tin nhắn (1 giữ hoà khí, 1 cứng rắn/móc mỉa). Mỗi mẫu tối đa 3-4 dòng cực ngắn.
 - PR KHÉO: Cuối cùng, mới chèn 1 câu rất mượt: "Vẫn lầy quá thì setting 'Nhắc bao lâu 1 lần' trên web cho hệ thống tự spam thay bạn nhé =))"`;
 
+    // Kiểm tra API Key trước khi khởi tạo
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (!apiKey) {
+      console.error("CRITICAL: GOOGLE_GENERATIVE_AI_API_KEY is not defined in environment variables.");
+      return new Response(
+        JSON.stringify({ error: "API Key của Google AI chưa được cấu hình. Vui lòng kiểm tra lại thiết lập hệ thống." }), 
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Khởi tạo Gemini AI với Model 2.5 Flash đời mới nhất
     const modelMsgs = await convertToModelMessages(messages);
     const google = createGoogleGenerativeAI({
-      apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+      apiKey: apiKey,
     });
 
     const result = await streamText({
@@ -35,9 +45,20 @@ TRƯỜNG HỢP 2: Người dùng nhờ đòi nợ, tức giận vì bị bùng 
     return result.toUIMessageStreamResponse();
   } catch (error: any) {
     console.error("AI Chat Error:", error);
+    
+    let errorMessage = "Đã xảy ra lỗi khi kết nối với AI. Vui lòng thử lại sau.";
+    
+    if (error.status === 401 || error.status === 403) {
+      errorMessage = "API Key của Google AI không hợp lệ hoặc đã hết hạn. Vui lòng cập nhật lại cấu hình.";
+    } else if (error.status === 429) {
+      errorMessage = "Hệ thống AI đang quá tải (hết quota). Vui lòng đợi một chút rồi thử lại.";
+    } else if (error.message) {
+      errorMessage = `Lỗi AI: ${error.message}`;
+    }
+
     return new Response(
-      JSON.stringify({ error: error.message || "Lỗi khi gọi AI API" }), 
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: errorMessage }), 
+      { status: error.status || 500, headers: { 'Content-Type': 'application/json' } }
     );
   }
 }
